@@ -8,7 +8,7 @@ class PixelBuffer {
     set(x,y, r,g,b,a) {
         x = x|0
         y = y|0
-        i = (y*this.width + x)*4;
+        let i = (y*this.width + x)*4;
 
         this.image.data[i+0] = r
         this.image.data[i+1] = g
@@ -16,7 +16,7 @@ class PixelBuffer {
         this.image.data[i+3] = a
     }
 
-    image() {
+    data() {
         return this.image
     }
 }
