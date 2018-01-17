@@ -1,6 +1,10 @@
 const PixelBuffer = require('./pixelbuffer.js')
+const Sphere = require('./sphere.js')
+const Ray = require('./ray.js')
+const {PerspectiveCamera} = require('./camera.js')
 
 const size = [320,180]
+const aspect = size.reduce((w,h) => h/w)
 
 // Create buffer and canvas
 const canvas = document.createElement('canvas')
@@ -12,14 +16,21 @@ const context = canvas.getContext('2d')
 
 buffer = new PixelBuffer(context, ...size)
 
+// Create scene
+const sphere = new Sphere(0,0,8, 1)
+const camera = new PerspectiveCamera(aspect, 1)
+
 // Draw something
 const draw = buffer => {
     const width = buffer.width
     const height = buffer.height
 
-    for(let y = 0; y < height; ++y)
-        for(let x = 0; x < width; ++x)
-            buffer.set(x,y, x/width*255, y/height*255, 128, 255)
+    buffer.map((x,y, u,v) => [u*255, v*255, 128, 255])
+    buffer.map((x,y, u,v) => {
+        let ray = camera.ray(u,v)
+        if(sphere.raycast(ray))
+            return [255,255,255,255]
+    })
 
     buffer.draw(0,0)
 }
