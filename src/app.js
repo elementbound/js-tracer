@@ -18,9 +18,13 @@ buffer = new PixelBuffer(context, ...size)
 
 // Create scene
 const sphere = new Sphere(0,0,8, 1)
-const camera = new PerspectiveCamera(aspect, 1)
+const camera = new PerspectiveCamera(aspect, 2)
 
 // Draw something
+const update = time => {
+    sphere.pos[0] = Math.sin(time/8000*Math.PI) * 2
+}
+
 const draw = buffer => {
     const width = buffer.width
     const height = buffer.height
@@ -35,4 +39,11 @@ const draw = buffer => {
     buffer.draw(0,0)
 }
 
-draw(buffer)
+const loop = time => {
+    update(time)
+    draw(buffer)
+
+    window.requestAnimationFrame(time => loop(time))
+}
+
+loop(0)
