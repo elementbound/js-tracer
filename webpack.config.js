@@ -1,22 +1,21 @@
-const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const dist = path.resolve(__dirname, './dist')
 
-module.exports = {
-	entry: './src/app.js',
-	
-	output: {
-		path: path.resolve(__dirname, 'dist'),
-		filename: '[name].js'
-	},
-	
-	plugins: [
-		new HtmlWebpackPlugin()
-	],
-	
-	devServer: {
-		contentBase: path.join(__dirname, "dist"),
-		compress: true,
-		port: 9000
-	}
-}
+module.exports =  {
+  entry: './src/app.js',
+  output: {
+    path: dist,
+    filename: '[name].js'
+  },
+
+  plugins: [new HtmlWebpackPlugin()],
+
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: dist,
+    compress: true,
+    port: 9000
+  }
+};
