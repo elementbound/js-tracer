@@ -1,3 +1,8 @@
+const {zip} = require('./utils.js')
+const {radtodeg, vecdir, vecpitch} = require('./vecmath.js')
+
+var logged = 0;
+
 class Sphere {
     constructor(x,y,z, r) {
         this.pos = [x,y,z]
@@ -6,6 +11,7 @@ class Sphere {
 
     raycast(ray) {
         // Based on: https://gamedev.stackexchange.com/a/117296
+        // Also: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
 
         let [i,j,k] = ray.dir
         let [x1,y1,z1] = ray.from
@@ -20,12 +26,26 @@ class Sphere {
         if(D < 0)
             return undefined
         else {
-            let t = -(b + Math.sqrt(D)) / 2*a
-            return {
-                t,
-                at: ray.at(t),
-                ray: ray
+            let t = Math.min(
+                (-b + Math.sqrt(D)) / 2*a,
+                (-b - Math.sqrt(D)) / 2*a
+            )
+            let at = ray.at(t)
+            
+            let rel = zip(at, this.pos).map(([a,b]) => a-b)
+            let u = radtodeg(vecdir(rel)) / 180
+            let v = radtodeg(vecpitch(rel)) / 180
+
+            let hit = {
+                t, at, ray, u,v, rel, object_pos: this.pos
             }
+
+            logged = ++logged % (1<<18)
+            if(logged == 0) {
+                console.log(hit)
+            }
+
+            return hit
         }
     }
 }
