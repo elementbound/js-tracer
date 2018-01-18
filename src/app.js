@@ -13,6 +13,26 @@ canvas.width = size[0]
 canvas.height = size[1]
 document.body.appendChild(canvas)
 
+let scale = window.innerWidth / size[0];
+canvas.style.cssText += `
+    position: fixed;
+    left: 50%;
+    top: 50%;
+
+    transform-origin: center center;
+    transform: translate(-50%, -50%) scale(${scale});
+
+    /* https://stackoverflow.com/questions/8597081/how-to-stretch-images-with-no-antialiasing */
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+
+`
+
 const context = canvas.getContext('2d')
 
 buffer = new PixelBuffer(context, ...size)
