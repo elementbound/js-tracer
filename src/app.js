@@ -3,6 +3,7 @@ const Sphere = require('./sphere.js')
 const Ray = require('./ray.js')
 const {PerspectiveCamera} = require('./camera.js')
 const Material = require('./material.js')
+const {zip, range, birandom} = require('./utils.js')
 
 const size = [1280,720].map(x => 0|x/8)
 const aspect = size.reduce((w,h) => h/w)
@@ -52,15 +53,25 @@ const update = time => {
 const draw = buffer => {
     const width = buffer.width
     const height = buffer.height
+	const samples = 4
 
     buffer.map((x,y, u,v) => {
-        let ray = camera.ray(u,v)
-        let hit = sphere.raycast(ray)
-
-        if(hit) 
-            return checkers.at(hit.u, hit.v)
-		else
-			return [24,24,24,255]
+        let rays = range(samples)
+			.map(() => [birandom(0.5 / width), birandom(0.5 / height)])
+			.map(offset => zip(offset, [u,v])
+				.map(([a,b]) => a+b)
+			)
+			.map(uv => camera.ray(...uv))
+			
+		let colors = rays.map(ray => 
+				(hit = sphere.raycast(ray)) ? 
+				checkers.at(hit.u, hit.v) : 
+				[24,24,24,255]
+			)
+			
+		return colors.reduce(
+				(x,y) => zip(x,y).map(([a,b]) => a+b))
+			.map(x => x/samples)
     })
 
     buffer.draw(0,0)
