@@ -13,6 +13,11 @@ const dot = (a,b) =>
 
 const veclen = v => 
     Math.sqrt(dot(v,v))
+	
+const normalized = v => {
+	let l = veclen(v)
+	return v.map(x => x/l)
+}
 
 const vecdir = v => 
     Math.atan2(v[1], v[0])
@@ -25,5 +30,6 @@ const vecpitch = v =>
 
 module.exports = {
     degtorad, radtodeg, 
-    dot, veclen, vecdir, vecpitch
+    dot, veclen, normalized,
+	vecdir, vecpitch
 }

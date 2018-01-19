@@ -1,9 +1,10 @@
 const {zip} = require('./utils.js')
+const {normalized} = require('./vecmath.js')
 
 class Ray {
     constructor(from, dir) {
         this.from = from
-        this.dir = dir
+        this.dir = normalized(dir)
     }
 
     at(t) {

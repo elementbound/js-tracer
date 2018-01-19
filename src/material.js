@@ -19,7 +19,7 @@ class Checkers {
 class UV {
     at(u,v) {
         return [u,v,0,1]
-            .map(x => (0|x*32)/32)
+            .map(x => (0|x*16)/16)
             .map(x =>  0|x*255)
     }
 }

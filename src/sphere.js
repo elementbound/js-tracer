@@ -33,8 +33,8 @@ class Sphere {
             let at = ray.at(t)
             
             let rel = zip(at, this.pos).map(([a,b]) => a-b)
-            let u = radtodeg(vecdir(rel)) / 180
-            let v = radtodeg(vecpitch(rel)) / 180
+            let u = 0.5 + radtodeg(vecdir(rel)) / 360
+            let v = 0.5 + radtodeg(vecpitch(rel)) / 180
 
             let hit = {
                 t, at, ray, u,v, rel, object_pos: this.pos
