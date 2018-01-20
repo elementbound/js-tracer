@@ -4,7 +4,7 @@ const Ray = require('./ray.js')
 const {PerspectiveCamera} = require('./camera.js')
 const Material = require('./material.js')
 
-const size = [1280,720].map(x => 0|x/8)
+const size = [1280,720].map(x => 0|x/6)
 const aspect = size.reduce((w,h) => h/w)
 
 // Create buffer and canvas
@@ -13,14 +13,12 @@ canvas.width = size[0]
 canvas.height = size[1]
 document.body.appendChild(canvas)
 
-let scale = window.innerWidth / size[0];
 canvas.style.cssText += `
     position: fixed;
     left: 50%;
     top: 50%;
 
     transform-origin: center center;
-    transform: translate(-50%, -50%) scale(${scale});
 
     /* https://stackoverflow.com/questions/8597081/how-to-stretch-images-with-no-antialiasing */
     image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
@@ -30,7 +28,6 @@ canvas.style.cssText += `
     image-rendering: pixelated; /* Chrome */
     image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
     -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
-
 `
 
 const context = canvas.getContext('2d')
@@ -73,4 +70,21 @@ const loop = time => {
     window.requestAnimationFrame(time => loop(time))
 }
 
+const fitToWidth = canvas => (w, h) => {
+	let size = [canvas.width, canvas.height]
+	let scale = Math.max(
+		w / size[0],
+		h / size[1]
+	)
+	canvas.style.transform = `translate(-50%, -50%) scale(${scale})`
+	
+	console.log(`Fitting: ${size} => ${[w, h]}`)
+}
+
 loop(0)
+window.onresize = () => {
+	window.requestAnimationFrame(() => {
+		fitToWidth(canvas)(window.innerWidth, window.innerHeight)
+	})
+}
+window.onresize()
