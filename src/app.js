@@ -3,6 +3,7 @@ const Sphere = require('./sphere.js')
 const Ray = require('./ray.js')
 const {PerspectiveCamera} = require('./camera.js')
 const Material = require('./material.js')
+const Renderer = require('./renderer.js')
 
 const size = [1280,720].map(x => 0|x/6)
 const aspect = size.reduce((w,h) => h/w)
@@ -35,11 +36,13 @@ const context = canvas.getContext('2d')
 buffer = new PixelBuffer(context, ...size)
 
 // Create scene
-const sphere = new Sphere(0,0,8, 1)
-const camera = new PerspectiveCamera(aspect, 2)
-
-const checkers = new Material.Checkers([[255,255,255,255], [255,0,0,255]], [1/12, 1/12])
-const uv_material = new Material.UV()
+const renderer = new Renderer(
+		new PerspectiveCamera(aspect, 2),
+		new Material.Checkers([[255,255,255,255], [255,0,0,255]], [1/12, 1/12])
+	)
+	
+const sphere = new Sphere(0,0,8, 1)	
+renderer.objects.push(sphere)
 
 // Draw something
 const update = time => {
@@ -50,16 +53,7 @@ const draw = buffer => {
     const width = buffer.width
     const height = buffer.height
 
-    buffer.map((x,y, u,v) => {
-        let ray = camera.ray(u,v)
-        let hit = sphere.raycast(ray)
-
-        if(hit) 
-            return checkers.at(hit.u, hit.v)
-		else
-			return [24,24,24,255]
-    })
-
+    buffer.map((x,y, u,v) => renderer.at(u,v))
     buffer.draw(0,0)
 }
 

@@ -1,8 +1,6 @@
 const {zip} = require('./utils.js')
 const {radtodeg, vecdir, vecpitch} = require('./vecmath.js')
 
-var logged = 0;
-
 class Sphere {
     constructor(x,y,z, r) {
         this.pos = [x,y,z]
@@ -36,16 +34,9 @@ class Sphere {
             let u = 0.5 + radtodeg(vecdir(rel)) / 360
             let v = 0.5 + radtodeg(vecpitch(rel)) / 180
 
-            let hit = {
+            return {
                 t, at, ray, u,v, rel, object_pos: this.pos
             }
-
-            logged = ++logged % (1<<18)
-            if(logged == 0) {
-                console.log(hit)
-            }
-
-            return hit
         }
     }
 }
