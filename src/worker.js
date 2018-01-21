@@ -1,5 +1,6 @@
 const Renderer = require('./renderer.js')
 const Scene = require('./scene.js')
+const schedule = require('./scheduler.js')
 
 var size = [1,1]
 var id = undefined
@@ -17,16 +18,8 @@ class Worker {
 	tick() {
 		console.time(`[Worker#${id}] chunk-render`)
 		let result = []
-		for(let y = 0; y < size[1]; ++y) {
-			for(let x = 0; x < size[0]; ++x) {
-				if((x*y) % worker_count != id)
-					continue
-				
-				result.push({
-					at: [x,y],
-					result: this.renderer.at(x/size[0],y/size[1])
-				})
-			}
+		for(let at of schedule(id, worker_count, size)) {
+			result.push(this.renderer.at(at[0]/size[0], at[1]/size[1]))
 		}
 		console.timeEnd(`[Worker#${id}] chunk-render`)
 		
@@ -52,6 +45,7 @@ onmessage = function(e) {
 		let result = worker.tick()
 		postMessage({
 			type: 'tick-result',
+			id,
 			result
 		})
 		

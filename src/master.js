@@ -1,5 +1,6 @@
 const {range, shuffle} = require('./utils.js')
 const Worker = require('worker-loader!./worker.js')
+const schedule = require('./scheduler.js')
 
 const addHandler = (event, handler) => {
 	let prevHandler = event
@@ -34,34 +35,24 @@ class Master {
 	}
 	
 	postFrame() {
-		let chunks = range(this.worker_count).map(_ => [])
-		
-		for(let y = 0; y < this.buffer.height; ++y) {
-			for(let x = 0; x < this.buffer.width; ++x) {
-				let worker_id = (x+y) % this.worker_count
-				chunks[worker_id].push([x,y])
-			}
-		}
-		
-		chunks.forEach((chunk, i) => 
-			this.workers[i].postMessage({
-				type: 'tick',
-				queue: chunk
+		this.workers.forEach(worker => 
+			worker.postMessage({
+				type: 'tick'
 			})
 		)
 		
 		this.active_workers = this.worker_count
 	}
 	
-	receiveChunk(chunk) {
+	receiveChunk(chunk, id) {
 		console.log(`[Master] Returned chunk, active workers: ${this.active_workers-1}`)
+		let size = [this.buffer.width, this.buffer.height]
 		
-		chunk.forEach(pixel => {
-			let x = pixel.at[0]
-			let y = pixel.at[1]
-			let color = pixel.result
+		let locations = [...schedule(id, this.worker_count, size)]
+		chunk.forEach((color, i) => {
+			let at = locations[i]
 			
-			buffer.set(x,y, ...color)
+			buffer.set(...at, ...color)
 		})
 		
 		if(this.onChunk)
@@ -82,7 +73,7 @@ class Master {
 			console.log('[Master] Got message:', e.type)
 			
 			if(e.type == 'tick-result') {
-				this.receiveChunk(e.result)
+				this.receiveChunk(e.result, e.id)
 			} else {
 				console.log(`[Master] Unknown message type: ${e.type}`)
 			}
