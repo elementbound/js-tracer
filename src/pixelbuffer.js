@@ -16,6 +16,19 @@ class PixelBuffer {
         this.image.data[i+2] = b
         this.image.data[i+3] = a
     }
+	
+	get(x,y) {
+		x = x|0
+		y = y|0
+        let i = (y*this.width + x)*4;
+		
+		return [
+			this.image.data[i+0],
+			this.image.data[i+1],
+			this.image.data[i+2],
+			this.image.data[i+3]
+		]
+	}
 
     data() {
         return this.image
