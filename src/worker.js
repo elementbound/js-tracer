@@ -15,7 +15,7 @@ class Worker {
 		this.renderer = Scene(size)
 	}
 	
-	tick() {
+	tick(time) {
 		console.time(`[Worker#${id}] chunk-render`)
 		let result = []
 		for(let at of schedule(id, worker_count, size)) {
@@ -23,7 +23,7 @@ class Worker {
 		}
 		console.timeEnd(`[Worker#${id}] chunk-render`)
 		
-		this.renderer.update()
+		this.renderer.update(time)
 		
 		return result
 	}
@@ -42,7 +42,7 @@ onmessage = function(e) {
 		console.log('[Worker] Handshake at size:', size)
 		worker.handshake(size)
 	} else if(e.type == 'tick') {
-		let result = worker.tick()
+		let result = worker.tick(e.time)
 		postMessage({
 			type: 'tick-result',
 			id,

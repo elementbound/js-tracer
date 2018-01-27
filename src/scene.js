@@ -25,9 +25,7 @@ module.exports = (size) => {
 	renderer.scene.updateMatrixWorld()
 	//sphere.updateMatrixWorld(); renderer.camera.updateMatrixWorld()
 	
-	renderer.update = () => {
-		let time = performance.now()
-		
+	renderer.update = time => {
 		sphere.position.x = Math.sin(time/8000 * 2*Math.PI) * 2
 		renderer.scene.updateMatrixWorld()
 	}

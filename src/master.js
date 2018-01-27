@@ -35,9 +35,11 @@ class Master {
 	}
 	
 	postFrame() {
+		let time = performance.now()
 		this.workers.forEach(worker => 
 			worker.postMessage({
-				type: 'tick'
+				type: 'tick',
+				time
 			})
 		)
 		

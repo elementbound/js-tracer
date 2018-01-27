@@ -81,7 +81,6 @@ const main = () => {
 
 	master.postFrame()
 	master.onFrame = loop
-	master.onChunk = _ => draw(buffer)
 	
 	window.onresize = () => {
 		window.requestAnimationFrame(() => {
