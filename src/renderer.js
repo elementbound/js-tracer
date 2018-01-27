@@ -1,30 +1,34 @@
+const three = require('three')
+
+var had_hit = false
+
 class Renderer {
-	constructor(camera, material) {
-		this.objects = []
-		this.background = [24,24,24, 255]
-		this.camera = camera
-		this.material = material
+	constructor(camera, material, background) {
+		let default_camera = new three.PerspectiveCamera(45, 1, 0.5, 1024)
+		let default_material = undefined
+		let default_background = [24,24,24, 255]
+		
+		this.scene = new three.Scene()
+		this.raycaster = new three.Raycaster()
+		
+		this.background = background || default_background
+		this.camera = camera || default_camera
+		this.material = material || default_material
 	}
 	
 	at(u, v) {
-		let ray = this.camera.ray(u,v)
+		const {raycaster, scene, background} = this
 		
-		let hits = this.objects.map(
-			object => object.raycast(ray)
-		).filter(
-			hit => hit || false
-		)
+		let uv = new three.Vector2(2*u - 1, 2*v - 1)
+		raycaster.setFromCamera(uv, this.camera)
 		
-		let hit = hits.length ? 
-			hits.reduce(
-				(a,b) => a.t < b.t ? a : b
-			) :
-			undefined
-
-        if(hit) 
-            return this.material.at(hit.u, hit.v)
+		let hits = raycaster.intersectObjects(scene.children, true)
+		let hit = hits[0] || undefined
+		
+		if(hit) 
+			return [hit.uv.x, hit.uv.y, 0, 1].map(x => 0|x*255)
 		else
-			return this.background
+			return background
 	}
 }
 
