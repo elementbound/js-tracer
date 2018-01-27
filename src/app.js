@@ -5,6 +5,7 @@ const Scene = require('./scene.js')
 const main = () => {
 	const size = [1280,720].map(x => 0|x/8)
 	const aspect = size.reduce((w,h) => h/w)
+	const incremental = false
 
 	// Die if Webworkers are not available
 	if(!window.Worker) {
@@ -52,7 +53,7 @@ const main = () => {
 	buffer.map(_ => renderer.background)
 	
 	// Set up webworkers
-	const master = new Master(8, buffer, renderer)
+	const master = new Master(4, buffer, renderer)
 	
 	// Draw something
 	const update = time => {
@@ -81,6 +82,7 @@ const main = () => {
 
 	master.postFrame()
 	master.onFrame = loop
+	master.onChunk = _ => incremental && draw(buffer)
 	
 	window.onresize = () => {
 		window.requestAnimationFrame(() => {
