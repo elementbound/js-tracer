@@ -18,7 +18,7 @@ module.exports = (size) => {
 	const sphereMaterial = new Material.Checkers([[255,0,0,255], [255,255,255,255]], [1/12,1/6])
 	const sphere = new three.Mesh(sphereGeometry, sphereMaterial)
 	
-	const knotGeometry = new three.TorusKnotGeometry(1, 0.2, 32*4, 4, 6,8)
+	const knotGeometry = new three.TorusKnotGeometry(1, 0.2, 32, 4, 6,8)
 	const knotMaterial = new Material.Checkers([[255,0,0,255], [255,255,255,255]], [1/48,1/12])
 	const knot = new three.Mesh(knotGeometry, knotMaterial)
 	

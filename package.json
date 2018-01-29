@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "js-logger": "^1.4.1",
+    "random-js": "^1.0.8",
     "three": "^0.89.0",
     "three-octree": "git+https://github.com/johnrees/three-octree.git#npm"
   }
