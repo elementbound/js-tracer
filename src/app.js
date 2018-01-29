@@ -2,6 +2,37 @@ const PixelBuffer = require('./pixelbuffer.js')
 const Master = require('./master.js')
 const Scene = require('./scene.js')
 
+const createOverlay = () => {
+	let overlay = document.createElement('div')
+	overlay.style.cssText = `
+		border: 1px solid black;
+		background-color: rgba(0,0,0,0);
+		color: white;
+		position: fixed;
+		right: 0px;
+		bottom: 0px;
+		z-index: 1;
+	`
+	
+	return overlay
+}
+
+const updateOverlay = (overlay, data) => {
+	let content = ''
+	
+	for(key in data) {
+		content += `<tr>
+			<td>${key}</td>
+			<td>${data[key]}</td>
+		</tr>`
+	}
+	
+	content = `<table>${content}</table>`;
+	console.log(content);
+	
+	overlay.innerHTML = content
+}
+
 const main = () => {
 	const size = [1280,720].map(x => 0|x/8)
 	const aspect = size.reduce((w,h) => h/w)
@@ -22,6 +53,12 @@ const main = () => {
 		document.body.appendChild(error);
 		return 0;
 	}
+	
+	// Create overlay
+	const overlay = createOverlay();
+	document.body.appendChild(overlay);
+	
+	updateOverlay({ayy: 'lmao'});
 
 	// Create buffer and canvas
 	const canvas = document.createElement('canvas')

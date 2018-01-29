@@ -1,12 +1,10 @@
 const three = require('three')
-const Material = require('./material.js')
 
 var had_hit = false
 
 class Renderer {
-	constructor(camera, material, background) {
+	constructor(camera, background) {
 		let default_camera = new three.PerspectiveCamera(45, 1, 0.5, 1024)
-		let default_material = new Material.Checkers([[255,0,0,255], [255,255,255,255]], [1/8,1/8])
 		let default_background = [24,24,24, 255]
 		
 		this.scene = new three.Scene()
@@ -14,11 +12,10 @@ class Renderer {
 		
 		this.background = background || default_background
 		this.camera = camera || default_camera
-		this.material = material || default_material
 	}
 	
 	at(u, v) {
-		const {raycaster, scene, background, material} = this
+		const {raycaster, scene, background} = this
 		
 		let uv = new three.Vector2(2*u - 1, 2*v - 1)
 		raycaster.setFromCamera(uv, this.camera)
@@ -26,10 +23,14 @@ class Renderer {
 		let hits = raycaster.intersectObjects(scene.children, true)
 		let hit = hits[0] || undefined
 		
-		if(hit) 
-			return material.at(hit.uv.x, hit.uv.y)
-		else
+		if(hit) {
+			let object = hit.object
+			let uv = hit.uv
+			
+			return object.material.at(uv.x, uv.y)
+		} else {
 			return background
+		}
 	}
 }
 

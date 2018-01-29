@@ -32,6 +32,8 @@ class Master {
 		
 		this.onFrame = undefined
 		this.onChunk = undefined
+		
+		this._frameStart = undefined
 	}
 	
 	postFrame() {
@@ -44,6 +46,8 @@ class Master {
 		)
 		
 		this.active_workers = this.worker_count
+		
+		this._frameStart = performance.now()
 	}
 	
 	receiveChunk(chunk, id) {
@@ -65,6 +69,9 @@ class Master {
 	}
 	
 	present() {
+		let frameTime = performance.now() - this._frameStart;
+		console.log(`[Master] Rendered frame in ${frameTime} ms`);
+		
 		if(this.onFrame)
 			this.onFrame(this)
 	}

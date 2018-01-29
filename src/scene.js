@@ -1,4 +1,5 @@
 const three = require('three')
+const Material = require('./material.js')
 const Renderer = require('./renderer.js')
 
 module.exports = (size) => {
@@ -13,20 +14,23 @@ module.exports = (size) => {
 		scene.add(camera)
 	}
 	
-	const sphereGeometry = new three.SphereGeometry(1, 24,12)
-	const sphereMaterial = new three.MeshLambertMaterial()
+	const sphereGeometry = new three.IcosahedronGeometry(1, 1)
+	const sphereMaterial = new Material.Checkers([[255,0,0,255], [255,255,255,255]], [1/12,1/6])
 	const sphere = new three.Mesh(sphereGeometry, sphereMaterial)
 	
-	sphere.position.x = 0
-	sphere.position.y = 0
-	sphere.position.z = 4
+	const knotGeometry = new three.TorusKnotGeometry(1, 0.2, 32*4, 4, 6,8)
+	const knotMaterial = new Material.Checkers([[255,0,0,255], [255,255,255,255]], [1/48,1/12])
+	const knot = new three.Mesh(knotGeometry, knotMaterial)
 	
-	renderer.scene.add(sphere)
+	sphere.position.z = 4
+	knot.position.z = 12
+	
+	renderer.scene.add(sphere, knot)
 	renderer.scene.updateMatrixWorld()
-	//sphere.updateMatrixWorld(); renderer.camera.updateMatrixWorld()
 	
 	renderer.update = time => {
-		sphere.position.x = Math.sin(time/8000 * 2*Math.PI) * 2
+		sphere.position.x = Math.sin(time/32000 * 2*Math.PI) * 2
+		renderer.camera.lookAt(sphere.position)
 		renderer.scene.updateMatrixWorld()
 	}
 	
