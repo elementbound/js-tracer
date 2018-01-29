@@ -1,6 +1,7 @@
 const PixelBuffer = require('./pixelbuffer.js')
 const Master = require('./master.js')
 const Scene = require('./scene.js')
+const Logger = require('js-logger')
 
 const createOverlay = () => {
 	let overlay = document.createElement('div')
@@ -28,7 +29,6 @@ const updateOverlay = (overlay, data) => {
 	}
 	
 	content = `<table>${content}</table>`;
-	console.log(content);
 	
 	overlay.innerHTML = content
 }
@@ -37,6 +37,10 @@ const main = () => {
 	const size = [1280,720].map(x => 0|x/8)
 	const aspect = size.reduce((w,h) => h/w)
 	const incremental = false
+	
+	Logger.useDefaults({
+		defaultLevel: Logger.WARN
+	})
 
 	// Die if Webworkers are not available
 	if(!window.Worker) {
@@ -58,7 +62,7 @@ const main = () => {
 	const overlay = createOverlay();
 	document.body.appendChild(overlay);
 	
-	updateOverlay({ayy: 'lmao'});
+	updateOverlay(overlay, {ayy: 'lmao'});
 
 	// Create buffer and canvas
 	const canvas = document.createElement('canvas')
@@ -104,6 +108,9 @@ const main = () => {
 	const loop = () => {
 		master.postFrame()
 		draw(buffer)
+		updateOverlay(overlay, {
+			'Render time': `${0|master.renderTime} ms`
+		})
 	}
 
 	const fitToWidth = canvas => (w, h) => {
@@ -114,7 +121,7 @@ const main = () => {
 		)
 		canvas.style.transform = `translate(-50%, -50%) scale(${scale})`
 		
-		console.log(`Fitting: ${size} => ${[w, h]}`)
+		Logger.info(`Fitting: ${size} => ${[w, h]}`)
 	}
 
 	master.postFrame()

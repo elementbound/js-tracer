@@ -1,6 +1,7 @@
 const {range, shuffle} = require('./utils.js')
 const Worker = require('worker-loader!./worker.js')
 const schedule = require('./scheduler.js')
+const Logger = require('js-logger')
 
 const addHandler = (event, handler) => {
 	let prevHandler = event
@@ -33,7 +34,9 @@ class Master {
 		this.onFrame = undefined
 		this.onChunk = undefined
 		
-		this._frameStart = undefined
+		this._renderStart = undefined
+		this._logger = Logger.get('Master')
+		this.renderTime = undefined
 	}
 	
 	postFrame() {
@@ -47,11 +50,12 @@ class Master {
 		
 		this.active_workers = this.worker_count
 		
-		this._frameStart = performance.now()
+		this._logger.time('Frame render')
+		this._renderStart = time
 	}
 	
 	receiveChunk(chunk, id) {
-		console.log(`[Master] Returned chunk, active workers: ${this.active_workers-1}`)
+		this._logger.debug(`Returned chunk, active workers: ${this.active_workers-1}`)
 		let size = [this.buffer.width, this.buffer.height]
 		
 		let locations = [...schedule(id, this.worker_count, size)]
@@ -69,8 +73,8 @@ class Master {
 	}
 	
 	present() {
-		let frameTime = performance.now() - this._frameStart;
-		console.log(`[Master] Rendered frame in ${frameTime} ms`);
+		this._logger.timeEnd('Frame render')
+		this.renderTime = performance.now() - this._renderStart;
 		
 		if(this.onFrame)
 			this.onFrame(this)
@@ -79,12 +83,12 @@ class Master {
 	register(worker) {
 		worker.onmessage = e => {
 			e = e.data
-			console.log('[Master] Got message:', e.type)
+			this._logger.debug('Got message:', e.type)
 			
 			if(e.type == 'tick-result') {
 				this.receiveChunk(e.result, e.id)
 			} else {
-				console.log(`[Master] Unknown message type: ${e.type}`)
+				this._logger.debug(`Unknown message type: ${e.type}`)
 			}
 		}
 	}
